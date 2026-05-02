@@ -3,136 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday My Love</title>
+    <title>Birthday Moonlight</title>
     <style>
-        :root { --main-pink: #ff9a9e; --dark-bg: #0b0d17; }
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: var(--dark-bg); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+        :root { --accent: #ff758c; --glass: rgba(255, 255, 255, 0.1); }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; }
         
-        /* 動態星空 */
-        .stars-container { position: fixed; width: 100%; height: 100%; background: radial-gradient(circle at bottom, #1b2735 0%, #090a0f 100%); z-index: -1; }
-        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; animation: twinkle var(--duration) infinite ease-in-out; }
-        @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.2); } }
+        /* 背景 Canvas */
+        #bgCanvas { position: fixed; top: 0; left: 0; z-index: -1; }
 
-        #app { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; color: white; transition: opacity 1s; }
-        .fade-in { animation: fadeIn 1.5s forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        #app { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: white; transition: all 0.8s ease; }
+        
+        /* 毛玻璃容器 */
+        .glass-card { 
+            background: var(--glass); 
+            backdrop-filter: blur(15px); 
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 40px; border-radius: 30px; 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            max-width: 350px; width: 85%;
+        }
 
-        /* 拍立得高級感 */
-        .polaroid { background: white; padding: 15px 15px 50px 15px; border-radius: 2px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); width: 280px; transform: rotate(-2deg); margin: 20px auto; transition: 0.5s; }
-        .polaroid img { width: 100%; height: 280px; object-fit: cover; display: block; filter: contrast(1.05) brightness(1.02); }
-        .polaroid-text { color: #444; margin-top: 15px; font-style: italic; font-size: 1.1rem; }
+        /* 拍立得特效 */
+        .polaroid { 
+            background: white; padding: 12px 12px 45px 12px; 
+            transform: rotate(-3deg); box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            margin-bottom: 25px;
+        }
+        .polaroid img { width: 100%; height: 260px; object-fit: cover; display: block; }
+        
+        /* 霓虹燈蛋糕 */
+        .cake-glow {
+            width: 120px; height: 100px; background: #ff758c;
+            border-radius: 15px 15px 5px 5px; margin: 50px auto;
+            position: relative; box-shadow: 0 0 30px #ff758c;
+            cursor: pointer;
+        }
+        .cake-glow::before {
+            content: ''; position: absolute; top: 30px; left: -5px; width: 130px; height: 15px;
+            background: #ffecf0; border-radius: 20px;
+        }
+        .candle-neon {
+            width: 8px; height: 40px; background: #fff; position: absolute;
+            top: -40px; left: 56px; border-radius: 4px; box-shadow: 0 0 10px #fff;
+        }
+        .flame-neon {
+            width: 14px; height: 22px; background: #ffdf00; border-radius: 50% 50% 20% 20%;
+            position: absolute; top: -25px; left: -3px;
+            box-shadow: 0 0 20px #ffdf00, 0 0 40px #ff758c;
+            animation: flicker 0.2s infinite alternate;
+        }
+        @keyframes flicker { to { opacity: 0.8; transform: scale(1.1); } }
 
-        /* 精緻蛋糕 */
-        .cake-wrap { position: relative; width: 200px; height: 150px; margin: 40px auto; cursor: pointer; }
-        .cake-layer { position: absolute; width: 160px; height: 60px; background: #fff5f5; border-radius: 10px; left: 20px; bottom: 0; box-shadow: 0 4px #f0d4d4; }
-        .cake-layer::after { content: ''; position: absolute; width: 100%; height: 20px; background: #ffb7c5; top: 15px; border-radius: 5px; }
-        .icing { position: absolute; width: 170px; height: 30px; background: #ff7b9c; border-radius: 20px; top: 65px; left: 15px; box-shadow: 0 4px #e66a8a; }
-        .candle-stick { position: absolute; width: 12px; height: 45px; background: #fff; left: 94px; top: 25px; border-radius: 3px; border-bottom: 4px solid #ff7b9c; }
-        .candle-fire { position: absolute; width: 16px; height: 26px; background: #ff4500; border-radius: 50% 50% 20% 20%; top: -22px; left: -2px; box-shadow: 0 0 20px #ff4500, 0 0 40px rgba(255,69,0,0.6); animation: flameMove 0.5s infinite alternate; }
-        @keyframes flameMove { from { transform: scale(1) rotate(-1deg); opacity: 0.8; } to { transform: scale(1.15) rotate(1deg); opacity: 1; } }
-
-        /* 文字與按鈕 */
-        h1 { font-weight: 200; letter-spacing: 5px; margin-bottom: 20px; }
-        .timer-text { font-size: 1.2rem; color: #ffeb3b; text-shadow: 0 0 10px rgba(255,235,59,0.5); }
-        button { padding: 15px 40px; background: transparent; border: 1px solid white; color: white; border-radius: 30px; cursor: pointer; font-size: 1rem; transition: 0.4s; letter-spacing: 2px; }
-        button:hover { background: white; color: black; }
-        .hidden { display: none; }
+        /* 按鈕與文字 */
+        button {
+            background: linear-gradient(45deg, #ff758c, #ff7eb3);
+            border: none; padding: 15px 40px; color: white; border-radius: 50px;
+            font-size: 1rem; font-weight: bold; cursor: pointer;
+            box-shadow: 0 10px 20px rgba(255,117,140,0.3); transition: 0.3s;
+        }
+        button:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(255,117,140,0.5); }
+        .hidden { display: none !important; }
+        .timer { font-size: 1.1rem; color: #ffd700; margin-top: 20px; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
-<div class="stars-container" id="stars"></div>
+<canvas id="bgCanvas"></canvas>
 
-<!-- 音樂元件 -->
-<audio id="audio" loop>
-    <source src="https://vps-2832b6fa.ytconvert.org/files/8R9AWJXsKHvkVrniH9mIt/output.mp3?token=43c25288d731ccb876a1aa7cf56290bdcf0719fbac6fb4028889d922dc47b469&expires=1777722467" type="audio/mpeg">
+<audio id="music" loop>
+    <source src="你的音樂網址" type="audio/mpeg">
 </audio>
 
-<div id="app" class="fade-in">
-    <!-- 第一步 -->
-    <div id="s1">
-        <h1>Happy Birthday</h1>
-        <p style="opacity: 0.7; margin-bottom: 30px;">這是一份跨越距離的禮物</p>
-        <button onclick="go2()">點擊進入</button>
+<div id="app">
+    <!-- Step 1 -->
+    <div id="p1" class="glass-card">
+        <h2 style="font-weight: 300; letter-spacing: 3px;">Tonight</h2>
+        <p style="opacity: 0.8;">跨越距離，為你摘下星空</p>
+        <button onclick="start()">開啟驚喜</button>
     </div>
 
-    <!-- 第二步 -->
-    <div id="s2" class="hidden">
+    <!-- Step 2 -->
+    <div id="p2" class="hidden">
         <div class="polaroid">
-            <img id="slideshow" src="你的照片1">
-            <div class="polaroid-text">相遇，是最好的安排 ❤️</div>
+            <img id="roll" src="你的照片1">
         </div>
-        <button onclick="go3()">看看驚喜</button>
+        <button onclick="go3()">點燃心願</button>
     </div>
 
-    <!-- 第三步 -->
-    <div id="s3" class="hidden">
-        <p style="margin-bottom: 30px;">閉上眼許願，然後吹熄它...</p>
-        <div class="cake-wrap" onclick="go4()">
-            <div class="candle-stick"><div class="candle-fire" id="fire"></div></div>
-            <div class="cake-layer"></div>
-            <div class="icing"></div>
+    <!-- Step 3 -->
+    <div id="p3" class="hidden">
+        <p>這是我為你準備的蛋糕</p>
+        <div class="cake-glow" onclick="go4()">
+            <div class="candle-neon"><div class="flame-neon" id="fire"></div></div>
         </div>
+        <p style="font-size: 0.8rem; opacity: 0.6;">(點擊火苗吹熄它)</p>
     </div>
 
-    <!-- 第四步 -->
-    <div id="s4" class="hidden">
-        <div class="polaroid" style="transform: rotate(3deg);">
-            <img src="你的照片2">
-            <div class="polaroid-text">下次見面，親口對你說</div>
-        </div>
-        <div class="timer-text" id="cd"></div>
+    <!-- Step 4 -->
+    <div id="p4" class="hidden glass-card">
+        <p>願望一定會實現</p>
+        <div class="timer" id="cd"></div>
+        <p style="margin-top: 20px;">7月9日，見面那天抱緊你 ❤️</p>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 <script>
-    // 生成隨機星星
-    const starsContainer = document.getElementById('stars');
-    for (let i = 0; i < 100; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        const size = Math.random() * 3 + 'px';
-        star.style.width = size;
-        star.style.height = size;
-        star.style.top = Math.random() * 100 + '%';
-        star.style.left = Math.random() * 100 + '%';
-        star.style.setProperty('--duration', Math.random() * 3 + 2 + 's');
-        starsContainer.appendChild(star);
+    // --- Canvas 流星背景系統 ---
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.onresize = resize;
+    resize();
+
+    class Star {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 2;
+            this.speed = Math.random() * 0.5;
+        }
+        draw() {
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        update() {
+            this.y += this.speed;
+            if (this.y > canvas.height) this.y = 0;
+        }
     }
 
-    const music = document.getElementById('audio');
-    const photos = ["你的照片1", "你的照片2"]; // 記得換成你的真實連結
+    for(let i=0; i<150; i++) stars.push(new Star());
 
-    function switchStep(oldId, newId) {
-        const app = document.getElementById('app');
-        app.style.opacity = '0';
-        setTimeout(() => {
-            document.getElementById(oldId).classList.add('hidden');
-            document.getElementById(newId).classList.remove('hidden');
-            app.style.opacity = '1';
-        }, 800);
+    function anim() {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+        ctx.fillRect(0,0,canvas.width, canvas.height);
+        stars.forEach(s => { s.update(); s.draw(); });
+        requestAnimationFrame(anim);
     }
+    anim();
 
-    function go2() {
-        music.play().catch(e => console.log("音樂播放受限"));
-        switchStep('s1', 's2');
+    // --- 邏輯控制 ---
+    const m = document.getElementById('music');
+    const pics = ["你的照片1", "你的照片2"]; // 換成你的網址
+
+    function start() {
+        m.play().catch(()=>{});
+        show('p1', 'p2');
         let i = 0;
         setInterval(() => {
-            i = (i + 1) % photos.length;
-            document.getElementById('slideshow').src = photos[i];
+            i = (i+1)%pics.length;
+            document.getElementById('roll').src = pics[i];
         }, 3000);
     }
 
-    function go3() { switchStep('s2', 's3'); }
+    function go3() { show('p2', 'p3'); }
 
     function go4() {
         document.getElementById('fire').style.display = 'none';
-        confetti({ particleCount: 200, spread: 90, origin: { y: 0.7 } });
-        setTimeout(() => {
-            switchStep('s3', 's4');
-            startCD();
-        }, 1200);
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ff758c', '#ffffff'] });
+        setTimeout(() => { show('p3', 'p4'); startCD(); }, 1200);
+    }
+
+    function show(oldId, newId) {
+        document.getElementById(oldId).classList.add('hidden');
+        document.getElementById(newId).classList.remove('hidden');
     }
 
     function startCD() {
@@ -144,7 +186,7 @@
             const hours = Math.floor((d % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const mins = Math.floor((d % (1000 * 60 * 60)) / (1000 * 60));
             const secs = Math.floor((d % (1000 * 60)) / 1000);
-            document.getElementById('cd').innerHTML = `距離見面還有：${days}天 ${hours}時 ${mins}分 ${secs}秒`;
+            document.getElementById('cd').innerText = `${days}D ${hours}H ${mins}M ${secs}S`;
         }, 1000);
     }
 </script>
