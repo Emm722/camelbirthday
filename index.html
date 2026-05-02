@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>給最愛的男友 · 生日星空樂園</title>
+    <title>給最愛的男友 · 星空煙花生日派對</title>
     <style>
         * {
             margin: 0;
@@ -32,6 +32,18 @@
             pointer-events: none;
         }
 
+        /* 煙花畫布 */
+        #fireworksCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            z-index: 15;
+            pointer-events: none;
+        }
+
         #app {
             position: relative;
             z-index: 10;
@@ -47,10 +59,10 @@
 
         .polaroid {
             background: #fef9e8;
-            padding: 12px 12px 35px 12px;
+            padding: 12px 12px 25px 12px;
             box-shadow: 0 20px 30px rgba(0, 0, 0, 0.4);
             transform: rotate(-1.5deg);
-            width: 270px;
+            width: 280px;
             margin: 20px auto;
             border-radius: 12px;
             transition: all 0.2s ease;
@@ -67,6 +79,9 @@
             color: #3a2c1f;
             margin-top: 12px;
             font-weight: 600;
+            font-size: 1rem;
+            min-height: 50px;
+            padding: 0 6px;
         }
 
         .cake {
@@ -128,14 +143,15 @@
         }
         
         .timer {
-            font-size: 1.3rem;
-            background: rgba(0,0,0,0.5);
+            font-size: 1.2rem;
+            background: rgba(0,0,0,0.6);
             backdrop-filter: blur(12px);
-            padding: 12px 20px;
+            padding: 10px 18px;
             border-radius: 60px;
             display: inline-block;
             margin-top: 15px;
             color: #ffec9f;
+            font-weight: 500;
         }
         
         button {
@@ -172,29 +188,23 @@
             margin-top: 8px;
         }
         
-        /* 第二頁按鈕動畫淡入 */
         .reveal-btn {
             animation: fadeInUp 0.5s ease forwards;
         }
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(15px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(15px);}
+            to { opacity: 1; transform: translateY(0);}
         }
         
         @media (max-width: 500px) {
-            .polaroid { width: 240px; }
-            .polaroid img { height: 230px; }
+            .polaroid { width: 250px; }
+            .polaroid img { height: 240px; }
             .cake { width: 150px; height: 150px; }
             .cake-bottom { width: 150px; height: 58px; }
             .cake-top { width: 150px; top: 73px; }
             .candle { left: 69px; top: 28px; }
-            .timer { font-size: 1rem; }
+            .timer { font-size: 0.9rem; }
+            .polaroid-text { font-size: 0.85rem; }
         }
         
         section {
@@ -209,9 +219,9 @@
 <body>
 
 <canvas id="starCanvas"></canvas>
+<canvas id="fireworksCanvas"></canvas>
 
 <div id="app">
-    <!-- 步驟 1: 起始頁 -->
     <section id="step1">
         <h1>✨ 寶貝 生日快樂 ✨</h1>
         <p style="font-size: 1.2rem; margin: 12px 0;">你是我宇宙中最亮的星</p>
@@ -220,18 +230,15 @@
         <div class="instruction">(記得開聲音喔🌸)</div>
     </section>
 
-    <!-- 步驟 2: 照片展示 (拍立得輪播，全部圖片跑完一輪才出現按鈕) -->
     <section id="step2" class="hidden">
         <div class="polaroid" style="transform: rotate(-2deg);">
             <img id="pic" src="https://i.ibb.co/4RBqhdkK/IMG-8809.jpg" alt="我們的回憶">
-            <div class="polaroid-text">💖 Happy Birthday to my babe 💖</div>
+            <div class="polaroid-text" id="picCaption">💖 Happy Birthday to my babe 💖</div>
         </div>
         <p id="photoCounter" style="margin-top: 8px; font-size: 0.9rem; opacity: 0.8;"></p>
-        <!-- 按鈕初始隱藏，等輪播跑完一輪後才顯示 -->
         <button id="goToCakeBtn" class="hidden" style="background:#ff9a9e;">🎂 看驚喜 🎂</button>
     </section>
 
-    <!-- 步驟 3: 許願蛋糕 + 吹熄火苗 -->
     <section id="step3" class="hidden">
         <p style="font-size: 1.3rem; font-weight: bold;">🎵 許個願望，吹熄蠟燭吧 🎵</p>
         <div class="cake-wrapper">
@@ -247,7 +254,6 @@
         <button id="forceBlowBtn" style="background:#ffb347; margin-top: 25px;">💨 吹蠟燭！ 💨</button>
     </section>
 
-    <!-- 步驟 4: 結尾與倒數 -->
     <section id="step4" class="hidden">
         <div class="polaroid" style="transform: rotate(3deg);">
             <img id="lastImg" src="https://i.ibb.co/4RBqhdkK/IMG-8809.jpg" alt="約定見面">
@@ -259,18 +265,18 @@
     </section>
 </div>
 
-<!-- 背景音樂 (使用您指定的直鏈) -->
 <audio id="bgMusic" loop preload="auto">
     <source src="https://mp3tourl.com/audio/1777741036879-550da38b-c8a2-423b-8a33-d8f9245a79e6.mp3" type="audio/mpeg">
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
 </audio>
 
 <script>
-    // ========== 1. 星星系統 (閃爍繁星+流星) ==========
+    // ========== 1. 星星系統 ==========
     const canvas = document.getElementById('starCanvas');
     let ctx = canvas.getContext('2d');
     let starsArray = [];
     let shootingStars = [];
-    let starCount = 260;
+    let starCount = 280;
     
     function resizeCanvas() {
         canvas.width = window.innerWidth;
@@ -315,7 +321,6 @@
             }
         }
         
-        // 流星
         for (let i = 0; i < shootingStars.length; i++) {
             const star = shootingStars[i];
             ctx.beginPath();
@@ -328,7 +333,6 @@
             ctx.arc(star.x, star.y, 2.2, 0, Math.PI*2);
             ctx.fillStyle = `rgba(255, 200, 100, ${star.alpha})`;
             ctx.fill();
-            
             star.x += star.speedX;
             star.y += star.speedY;
             star.alpha -= 0.018;
@@ -360,94 +364,199 @@
     
     window.addEventListener('resize', () => resizeCanvas());
     
-    // ========== 2. 核心互動邏輯 ==========
+    // ========== 2. 煙花系統 (最後一頁綻放) ==========
+    const fireworksCanvas = document.getElementById('fireworksCanvas');
+    let fwCtx = fireworksCanvas.getContext('2d');
+    let particles = [];
+    let fireworksActive = false;
+    let animationId = null;
+    
+    function resizeFireworks() {
+        fireworksCanvas.width = window.innerWidth;
+        fireworksCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', () => resizeFireworks());
+    
+    class FireParticle {
+        constructor(x, y, vx, vy, color, size, gravity = 0.2) {
+            this.x = x;
+            this.y = y;
+            this.vx = vx;
+            this.vy = vy;
+            this.color = color;
+            this.size = size;
+            this.gravity = gravity;
+            this.alpha = 1;
+            this.decay = 0.02 + Math.random() * 0.02;
+        }
+        update() {
+            this.vx *= 0.98;
+            this.vy += this.gravity;
+            this.x += this.vx;
+            this.y += this.vy;
+            this.alpha -= this.decay;
+            return this.alpha > 0;
+        }
+        draw() {
+            fwCtx.save();
+            fwCtx.globalAlpha = this.alpha;
+            fwCtx.beginPath();
+            fwCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            fwCtx.fillStyle = this.color;
+            fwCtx.fill();
+            fwCtx.restore();
+        }
+    }
+    
+    function createFirework(x, y) {
+        const colors = ['#ff0040', '#ff8000', '#ffff00', '#00ff80', '#00bfff', '#ff00ff', '#ff69b4', '#ffd700'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const particleCount = 70 + Math.floor(Math.random() * 40);
+        for (let i = 0; i < particleCount; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 2 + Math.random() * 6;
+            const vx = Math.cos(angle) * speed * (Math.random() * 1.2);
+            const vy = Math.sin(angle) * speed * (Math.random() * 1.2);
+            const size = 2 + Math.random() * 3;
+            particles.push(new FireParticle(x, y, vx, vy, color, size, 0.15));
+        }
+    }
+    
+    function randomFirework() {
+        if (!fireworksActive) return;
+        const x = Math.random() * fireworksCanvas.width;
+        const y = Math.random() * fireworksCanvas.height * 0.7 + 50;
+        createFirework(x, y);
+        setTimeout(() => {
+            if (fireworksActive) randomFirework();
+        }, 400 + Math.random() * 500);
+    }
+    
+    function updateFireworks() {
+        if (!fwCtx || !fireworksActive) return;
+        fwCtx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+        for (let i = particles.length-1; i >= 0; i--) {
+            const alive = particles[i].update();
+            particles[i].draw();
+            if (!alive) particles.splice(i,1);
+        }
+        if (fireworksActive) {
+            animationId = requestAnimationFrame(updateFireworks);
+        }
+    }
+    
+    function startFireworks() {
+        if (fireworksActive) return;
+        fireworksActive = true;
+        resizeFireworks();
+        particles = [];
+        if (animationId) cancelAnimationFrame(animationId);
+        updateFireworks();
+        for (let i = 0; i < 6; i++) {
+            setTimeout(() => {
+                if (fireworksActive) {
+                    const x = Math.random() * fireworksCanvas.width;
+                    const y = Math.random() * fireworksCanvas.height * 0.6 + 80;
+                    createFirework(x, y);
+                }
+            }, i * 180);
+        }
+        randomFirework();
+    }
+    
+    function stopFireworks() {
+        fireworksActive = false;
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        }
+        if (fwCtx) fwCtx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+        particles = [];
+    }
+    
+    // ========== 3. 核心互動 (八張照片+每張不同敘述) ==========
     let photoInterval = null;
     let audio = document.getElementById('bgMusic');
     let countdownInterval = null;
     let blown = false;
     
-    // 照片陣列 (ImgBB 清晰直鏈，您提供的四張)
-    // 注意: 這些直鏈都是您之前確認過的 i.ibb.co 連結，請確保連結有效
+    // 8張照片 (擴充)
     const photosArray = [
-        "https://i.ibb.co/4RBqhdkK/IMG-8809.jpg",   // 主照片
-        "https://i.ibb.co/7JXKt9sH/IMG-8685.jpg",   // 清晰照
+        "https://i.ibb.co/4RBqhdkK/IMG-8809.jpg",
+        "https://i.ibb.co/7JXKt9sH/IMG-8685.jpg",
         "https://i.ibb.co/1GmqYZN2/24-FE17-C4-AC93-40-BD-B559-D9-F05698-C1-F4.jpg",
-        "https://i.ibb.co/k6XY24c5/IMG-9091.jpg"
+        "https://i.ibb.co/k6XY24c5/IMG-9091.jpg",
+        "https://i.ibb.co/CKhCzB1S/C8EA2504-C469-42B5-ACB3-4948693E7AAA.jpg",
+        "https://i.ibb.co/HDVqTJ50/IMG-8685.jpg",
+        "https://i.ibb.co/YBLk42Sj/24-FE17-C4-AC93-40-BD-B559-D9-F05698-C1-F4.jpg",
+        "https://i.ibb.co/yBqLF6sd/IMG-9091.jpg"
     ];
+    
+    // 每張照片的專屬敘述 (八個不同)
+    const captions = [
+        "💖 好想親下去喔 💖",
+        "🌸 傻傻地好喜歡 🌸",
+        "🍰 有人偷偷哭抓到 🍰",
+        "✨ Judy &=& Nick! ✨",
+        "💫 好醜啊哈哈哈哈 💫",
+        "🎈 生日這天只想對你說愛你 🎈",
+        "🌟 和你在一起的每天都甜蜜 🌟",
+        "❤️ 寶貝，生日快樂，我的世界因你完整 ❤️"
+    ];
+    
     const lastPhoto = "https://i.ibb.co/4RBqhdkK/IMG-8809.jpg";
     
     let currentPicIndex = 0;
-    let hasCycledOnce = false;      // 是否已完整輪播一輪
+    let hasCycledOnce = false;
     let totalPhotos = photosArray.length;
     
-    // 音樂播放 (由使用者點擊首頁按鈕觸發)
     function playBackgroundMusic() {
         if (audio) {
             audio.volume = 0.45;
-            audio.play().then(() => {
-                console.log("🎵 音樂播放成功 💖");
-            }).catch(e => {
-                console.log("自動播放受限，但仍可點擊");
-                // 某些瀏覽器仍需額外交互，但已在點擊時調用，問題不大
-            });
+            audio.play().catch(e => console.log("等待用戶互動"));
         }
     }
     
-    // 顯示步驟2，並啟動輪播 (條件：輪播完整一輪後才顯示按鈕)
     function toStep2() {
-        // 隱藏步驟1
         document.getElementById('step1').classList.add('hidden');
         const step2Div = document.getElementById('step2');
         step2Div.classList.remove('hidden');
         
-        // 重置輪播狀態
         if (photoInterval) clearInterval(photoInterval);
         currentPicIndex = 0;
         hasCycledOnce = false;
         const picElement = document.getElementById('pic');
+        const captionEl = document.getElementById('picCaption');
         const goBtn = document.getElementById('goToCakeBtn');
         const counterEl = document.getElementById('photoCounter');
         
-        // 隱藏按鈕 + 重置計數器文字
         goBtn.classList.add('hidden');
-        counterEl.innerText = `📸 謝謝寶寶過來找我！ ${currentPicIndex+1} / ${totalPhotos}`;
-        
-        // 設定第一張照片
+        counterEl.innerText = `📸 回憶旅程 ${currentPicIndex+1} / ${totalPhotos}`;
         picElement.src = photosArray[0];
+        captionEl.innerText = captions[0];
         
-        // 開始輪播 (每隔2.8秒換一張)
         photoInterval = setInterval(() => {
-            // 移動到下一張
             let nextIndex = (currentPicIndex + 1) % totalPhotos;
             currentPicIndex = nextIndex;
             picElement.src = photosArray[currentPicIndex];
+            captionEl.innerText = captions[currentPicIndex];
             counterEl.innerText = `📸 最愛你了 ${currentPicIndex+1} / ${totalPhotos}`;
             
-            // 檢查是否完成一輪 (從最後一張回到第一張的時候)
             if (currentPicIndex === 0 && !hasCycledOnce) {
-                // 已經完整跑過一圈 (從0->1->2->3->0)
                 hasCycledOnce = true;
-                // 清除輪播計時器，停在最後一張(或者繼續也可以，但按鈕出現，仍可保留溫暖)
                 if (photoInterval) clearInterval(photoInterval);
                 photoInterval = null;
-                counterEl.innerText = `✨ 滿滿的回憶 ✨ 共 ${totalPhotos} 張珍貴瞬間`;
-                // 顯示按鈕 ＋ 可愛彈出動畫
+                counterEl.innerText = `✨ 滿滿回憶 ✨ 共 ${totalPhotos} 張珍貴瞬間`;
                 goBtn.classList.remove('hidden');
                 goBtn.classList.add('reveal-btn');
-                // 可額外撒小花效果(簡單震動)
             }
         }, 2800);
     }
     
-    // 前往蛋糕頁 (步驟3)
     function toStep3() {
-        if (photoInterval) {
-            clearInterval(photoInterval);
-            photoInterval = null;
-        }
+        if (photoInterval) clearInterval(photoInterval);
         document.getElementById('step2').classList.add('hidden');
         document.getElementById('step3').classList.remove('hidden');
-        
         blown = false;
         const flame = document.getElementById('candleFlame');
         if (flame) {
@@ -458,28 +567,20 @@
         }
     }
     
-    // 吹熄蠟燭邏輯
     function blowCandle() {
         if (blown) return;
         const flame = document.getElementById('candleFlame');
         if (!flame) return;
-        
         flame.classList.add('flame-out');
         flame.style.animation = 'none';
         flame.style.boxShadow = 'none';
         blown = true;
-        
-        // 微震動回饋
         const cakeDiv = document.querySelector('.cake');
         if (cakeDiv) {
             cakeDiv.style.transform = 'scale(0.97)';
             setTimeout(() => { if(cakeDiv) cakeDiv.style.transform = ''; }, 130);
         }
-        
-        // 0.4秒後進入最終祝福頁
-        setTimeout(() => {
-            toStep4();
-        }, 380);
+        setTimeout(() => { toStep4(); }, 380);
     }
     
     function toStep4() {
@@ -487,11 +588,12 @@
         document.getElementById('step3').classList.add('hidden');
         const step4Div = document.getElementById('step4');
         step4Div.classList.remove('hidden');
-        
         const lastImgElem = document.getElementById('lastImg');
         if (lastImgElem) lastImgElem.src = lastPhoto;
         
-        // 倒數 2026/7/9
+        // 啟動煙花效果 ✨
+        startFireworks();
+        
         const targetDate = new Date("July 9, 2026 00:00:00").getTime();
         function updateCountdown() {
             const now = new Date().getTime();
@@ -509,93 +611,54 @@
         }
         updateCountdown();
         countdownInterval = setInterval(updateCountdown, 1000);
-        
-        if (audio && audio.paused) {
-            audio.play().catch(e => console.log("音樂播放需互動"));
-        }
+        if (audio && audio.paused) audio.play().catch(e => console.log);
     }
     
-    // 綁定事件 & 首頁音樂+顯示控制 (修正: 點首頁按鈕時播放音樂 + 到第二頁)
     function bindInteractions() {
         const startBtn = document.getElementById('startBtn');
         if (startBtn) {
             startBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                // 播放音樂 (確保是使用者點擊觸發)
                 playBackgroundMusic();
-                // 前往第二頁
                 toStep2();
             });
         }
-        
         const goToCake = document.getElementById('goToCakeBtn');
-        if (goToCake) {
-            goToCake.addEventListener('click', () => {
-                toStep3();
-            });
-        }
-        
+        if (goToCake) goToCake.addEventListener('click', () => toStep3());
         const forceBtn = document.getElementById('forceBlowBtn');
-        if (forceBtn) {
-            forceBtn.addEventListener('click', () => blowCandle());
-        }
-        
+        if (forceBtn) forceBtn.addEventListener('click', () => blowCandle());
         const cakeArea = document.getElementById('cakeClickArea');
-        if (cakeArea) {
-            cakeArea.addEventListener('click', () => {
-                if (!blown) blowCandle();
-            });
-        }
-        
+        if (cakeArea) cakeArea.addEventListener('click', () => { if (!blown) blowCandle(); });
         const flameOnly = document.getElementById('candleFlame');
         if (flameOnly) {
-            flameOnly.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (!blown) blowCandle();
-            });
+            flameOnly.addEventListener('click', (e) => { e.stopPropagation(); if (!blown) blowCandle(); });
         }
-        
         const replayBtn = document.getElementById('playMusicAgain');
         if (replayBtn) {
             replayBtn.addEventListener('click', () => {
-                if (audio) {
-                    audio.currentTime = 0;
-                    audio.play().catch(e => console.log);
-                }
+                if (audio) { audio.currentTime = 0; audio.play().catch(e => console.log); }
             });
         }
     }
     
-    // 預先載入圖片優化體驗 (可選)
     function preloadImages() {
-        photosArray.forEach(src => {
-            const img = new Image();
-            img.src = src;
-        });
-        const lastImgPre = new Image();
-        lastImgPre.src = lastPhoto;
+        photosArray.forEach(src => { const img = new Image(); img.src = src; });
+        const lastImgPre = new Image(); lastImgPre.src = lastPhoto;
     }
     
-    // 初始化星星與事件
     window.onload = () => {
         resizeCanvas();
         animateStars();
+        resizeFireworks();
         bindInteractions();
-        preloadImages();  // 提前加載照片, 讓輪播更流暢
-        
-        // 確保音樂不會自動播放（因瀏覽器策略，首頁按鈕點擊後才播放，已符合")
-        // 另外，如果用戶在 step3 不小心重複吹熄防呆完善
+        preloadImages();
     };
-    
-    // 全域備份 (避免遺漏)
-    window.toStep3 = toStep3;
-    window.blowCandle = blowCandle;
     
     window.addEventListener('beforeunload', () => {
         if (photoInterval) clearInterval(photoInterval);
         if (countdownInterval) clearInterval(countdownInterval);
+        stopFireworks();
     });
-
 </script>
 </body>
 </html>
