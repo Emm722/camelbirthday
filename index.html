@@ -233,7 +233,7 @@
     <section id="step2" class="hidden">
         <div class="polaroid" style="transform: rotate(-2deg);">
             <img id="pic" src="https://i.ibb.co/4RBqhdkK/IMG-8809.jpg" alt="我們的回憶">
-            <div class="polaroid-text" id="picCaption">💖 Happy Birthday to my babe 💖</div>
+            <div class="polaroid-text" id="picCaption"> Happy Birthday to my babe 💖</div>
         </div>
         <p id="photoCounter" style="margin-top: 8px; font-size: 0.9rem; opacity: 0.8;"></p>
         <button id="goToCakeBtn" class="hidden" style="background:#ff9a9e;">🎂 看驚喜 🎂</button>
@@ -607,7 +607,7 @@
             const hours = Math.floor((distance % 86400000) / 3600000);
             const minutes = Math.floor((distance % 3600000) / 60000);
             const secs = Math.floor((distance % 60000) / 1000);
-            document.getElementById('cd').innerHTML = `📅 距離7月9日見面還有 ${days}天 ${hours}時 ${minutes}分 ${secs}秒 💖`;
+            document.getElementById('cd').innerHTML = `📅 距離下次見面還有 ${days}天 ${hours}時 ${minutes}分 ${secs}秒 💖`;
         }
         updateCountdown();
         countdownInterval = setInterval(updateCountdown, 1000);
