@@ -3,36 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>寶貝生日快樂！</title>
+    <title>生日快樂 ❤️</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #020205; font-family: 'PingFang TC', sans-serif; }
-        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/123163/stars.png') repeat; opacity: 0.6; }
-        #app { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; color: white; z-index: 10; }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #020205; font-family: sans-serif; }
+        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: #020205 url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/123163/stars.png') repeat; opacity: 0.5; }
+        #app { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; color: white; padding: 20px; box-sizing: border-box; }
 
-        /* 拍立得樣式 */
-        .polaroid { background: white; padding: 15px 15px 50px 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: rotate(-2deg); margin: 20px; width: 280px; }
-        .polaroid img { width: 100%; height: 280px; object-fit: cover; display: block; border: 1px solid #eee; }
-        .polaroid-text { color: #333; margin-top: 15px; font-family: 'cursive'; font-size: 1.1rem; }
+        /* 拍立得相框 */
+        .polaroid { background: white; padding: 10px 10px 40px 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: rotate(-2deg); margin: 20px auto; width: 260px; }
+        .polaroid img { width: 100%; height: 260px; object-fit: cover; display: block; background: #eee; }
+        .polaroid-text { color: #333; margin-top: 10px; font-size: 1rem; }
 
-        /* 精緻 CSS 蛋糕 */
-        .cake-container { position: relative; width: 200px; height: 200px; margin: 20px auto; cursor: pointer; }
-        .cake-body { position: absolute; bottom: 0; width: 150px; height: 80px; background: #f4e1d2; border-radius: 10px 10px 0 0; left: 25px; box-shadow: inset 0 -10px #eecdb3, 0 5px 15px rgba(0,0,0,0.3); }
-        .cake-icing { position: absolute; top: -10px; width: 150px; height: 30px; background: #ff7b9c; border-radius: 20px; box-shadow: 0 4px #ff5e85; }
-        .candle { position: absolute; top: -50px; left: 90px; width: 12px; height: 50px; background: #fff; border-radius: 3px; border-bottom: 5px solid #ff7b9c; }
-        
-        /* 真實火苗動畫 */
-        .flame { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); width: 15px; height: 25px; background: orange; border-radius: 50% 50% 20% 20%; box-shadow: 0 0 15px rgba(255,165,0,0.8); animation: glow 0.6s infinite alternate; }
-        @keyframes glow { 
-            0% { transform: translateX(-50%) scale(1); opacity: 0.9; background: orange; } 
-            100% { transform: translateX(-50%) scale(1.2); opacity: 1; background: #ff4500; box-shadow: 0 0 25px rgba(255,69,0,0.9); } 
-        }
+        /* CSS 蛋糕 */
+        .cake-container { position: relative; width: 160px; height: 160px; margin: 40px auto; cursor: pointer; }
+        .cake-body { position: absolute; bottom: 0; width: 140px; height: 70px; background: #f4e1d2; border-radius: 10px 10px 0 0; left: 10px; box-shadow: inset 0 -10px #eecdb3; }
+        .cake-icing { position: absolute; top: -5px; width: 140px; height: 25px; background: #ff7b9c; border-radius: 20px; }
+        .candle { position: absolute; top: -40px; left: 74px; width: 10px; height: 40px; background: #fff; border-radius: 2px; }
+        .flame { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 12px; height: 20px; background: #ff4500; border-radius: 50% 50% 20% 20%; box-shadow: 0 0 15px #ff4500; animation: flicker 0.6s infinite alternate; }
+        @keyframes flicker { 0% { transform: translateX(-50%) scale(1); } 100% { transform: translateX(-50%) scale(1.2); } }
 
-        /* 倒數計時 */
-        .countdown-box { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.2); margin-top: 20px; }
-        .timer { font-size: 1.3rem; color: #ffeb3b; font-weight: bold; margin-top: 10px; }
-
-        button { padding: 12px 30px; background: #ff7b9c; color: white; border: none; border-radius: 25px; cursor: pointer; font-size: 1rem; transition: 0.3s; }
-        button:hover { background: #ff5e85; transform: scale(1.05); }
+        .timer { font-size: 1.2rem; color: #ffeb3b; margin-top: 15px; font-weight: bold; }
+        button { padding: 15px 40px; background: #ff7b9c; color: white; border: none; border-radius: 30px; cursor: pointer; font-size: 1.1rem; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -40,95 +31,89 @@
 
 <div class="stars"></div>
 
-<!-- 音樂播放器 -->
+<!-- 音樂 -->
 <audio id="bgMusic" loop>
-    <source src="https://vps-2832b6fa.ytconvert.org/files/8R9AWJXsKHvkVrniH9mIt/output.mp3?token=43c25288d731ccb876a1aa7cf56290bdcf0719fbac6fb4028889d922dc47b469&expires=1777722467" type="audio/mpeg">
+    <source src="你的音樂網址" type="audio/mpeg">
 </audio>
 
 <div id="app">
-    <!-- 第一頁：音樂啟動 -->
+    <!-- 步驟 1 -->
     <div id="step1">
-        <h1 style="font-size: 2rem;">Hey...</h1>
-        <p>今天是一個特別的日子</p>
-        <button onclick="startAll()">進入我們的星空</button>
+        <h1>Hi 寶貝 ❤️</h1>
+        <p>今天是你的大日子</p>
+        <button onclick="goStep2()">開啟驚喜</button>
     </div>
 
-    <!-- 第二頁：照片回憶 -->
+    <!-- 步驟 2 -->
     <div id="step2" class="hidden">
         <div class="polaroid">
-            <img id="slideshow" src="<a href="https://ibb.co/Tx8mrGf9"><img src="https://i.ibb.co/LXtnvyFV/IMG-8809.jpg" alt="IMG-8809" border="0"></a>">
-            <div class="polaroid-text">駱駱大一歲了！謝謝你一直都在❤️</div>
+            <img id="slideshow" src="你的照片1">
+            <div class="polaroid-text">Happy Birthday!</div>
         </div>
-        <button onclick="toCake()">這是我準備的驚喜</button>
+        <button onclick="goStep3()">這是送給你的蛋糕</button>
     </div>
 
-    <!-- 第三頁：精緻蛋糕 -->
+    <!-- 步驟 3 -->
     <div id="step3" class="hidden">
-        <h3>點擊火苗吹熄，許下願望...</h3>
-        <div class="cake-container" onclick="blowOut()">
-            <div class="candle">
-                <div class="flame" id="flame"></div>
-            </div>
-            <div class="cake-body">
-                <div class="cake-icing"></div>
-            </div>
+        <p>許完願後，點擊火苗吹熄它</p>
+        <div class="cake-container" onclick="goStep4()">
+            <div class="candle"><div class="flame" id="f"></div></div>
+            <div class="cake-body"><div class="cake-icing"></div></div>
         </div>
     </div>
 
-    <!-- 第四頁：倒數與結尾 -->
+    <!-- 步驟 4 -->
     <div id="step4" class="hidden">
-        <div class="polaroid" style="transform: rotate(3deg);">
-            <img src="<a href="https://ibb.co/MDMm595D"><img src="https://i.ibb.co/tM89P3PM/IMG-8685.jpg" alt="IMG-8685" border="0"></a>">
-            <div class="polaroid-text">7月9日，等我來抱你嘻嘻</div>
+        <div class="polaroid" style="transform: rotate(2deg);">
+            <img src="你的照片2">
+            <div class="polaroid-text">7月9日，等我見你</div>
         </div>
-        <div class="countdown-box">
-            <div>距離下次見面還有：</div>
-            <div id="timer" class="timer">載入中...</div>
-        </div>
+        <div id="timeText" class="timer">載入中...</div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 <script>
-    const music = document.getElementById('bgMusic');
-    const photos = ["<a href="https://ibb.co/LHP0p6z"><img src="https://i.ibb.co/y7RNs5n/IMG-7491.png" alt="IMG-7491" border="0"></a>", "<a href="https://ibb.co/yBqLF6sd"><img src="https://i.ibb.co/gFJsZSgm/IMG-9091.jpg" alt="IMG-9091" border="0"></a>", "<a href="https://ibb.co/vps9VZ1"><img src="https://i.ibb.co/4zskKPW/IMG-1789.png" alt="IMG-1789" border="0"></a>"]; // 記得換成真實連結
-    let photoIdx = 0;
+    // 防止程式報錯導致卡死的機制
+    window.onerror = function() { return true; };
 
-    function startAll() {
-        music.play();
+    const music = document.getElementById('bgMusic');
+    // 請務必確保這裡的網址是正確的，或先用佔位圖測試
+    const photos = ["你的照片1", "你的照片2"]; 
+    
+    function goStep2() {
+        // 嘗試播放音樂，就算失敗也繼續往下跑
+        try { music.play(); } catch(e) {}
+        
         document.getElementById('step1').classList.add('hidden');
         document.getElementById('step2').classList.remove('hidden');
+        
+        let idx = 0;
         setInterval(() => {
-            photoIdx = (photoIdx + 1) % photos.length;
-            document.getElementById('slideshow').src = photos[photoIdx];
+            idx = (idx + 1) % photos.length;
+            document.getElementById('slideshow').src = photos[idx];
         }, 3000);
     }
 
-    function toCake() {
+    function goStep3() {
         document.getElementById('step2').classList.add('hidden');
         document.getElementById('step3').classList.remove('hidden');
     }
 
-    function blowOut() {
-        document.getElementById('flame').style.display = 'none';
-        confetti({ particleCount: 200, spread: 80, origin: { y: 0.7 } });
-        setTimeout(() => {
-            document.getElementById('step3').classList.add('hidden');
-            document.getElementById('step4').classList.remove('hidden');
-            startCountdown();
-        }, 1500);
-    }
-
-    function startCountdown() {
+    function goStep4() {
+        document.getElementById('step3').classList.add('hidden');
+        document.getElementById('step4').classList.remove('hidden');
+        
+        // 倒數計時邏輯
         const target = new Date("July 9, 2026 00:00:00").getTime();
         setInterval(() => {
             const now = new Date().getTime();
             const d = target - now;
-            const days = Math.floor(d / (1000*60*60*24));
-            const hours = Math.floor((d%(1000*60*60*24))/(1000*60*60));
-            const mins = Math.floor((d%(1000*60*60))/(1000*60));
-            const secs = Math.floor((d%(1000*60))/1000);
-            document.getElementById('timer').innerText = `${days}天 ${hours}時 ${mins}分 ${secs}秒`;
+            const days = Math.floor(d / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((d % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((d % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((d % (1000 * 60)) / 1000);
+            document.getElementById('timeText').innerText = 
+                "距離見面還有：" + days + "天 " + hours + "時 " + mins + "分 " + secs + "秒";
         }, 1000);
     }
 </script>
