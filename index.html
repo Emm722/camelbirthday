@@ -53,6 +53,7 @@
             width: 270px;
             margin: 20px auto;
             border-radius: 12px;
+            transition: all 0.2s ease;
         }
         .polaroid img {
             width: 100%;
@@ -60,6 +61,7 @@
             object-fit: cover;
             display: block;
             border-radius: 8px;
+            background: #f0e6d2;
         }
         .polaroid-text {
             color: #3a2c1f;
@@ -147,6 +149,7 @@
             cursor: pointer;
             box-shadow: 0 6px 0 #b1624b;
             margin-top: 20px;
+            transition: transform 0.07s, box-shadow 0.07s;
         }
         button:active {
             transform: translateY(3px);
@@ -167,6 +170,21 @@
             padding: 6px 12px;
             border-radius: 60px;
             margin-top: 8px;
+        }
+        
+        /* 第二頁按鈕動畫淡入 */
+        .reveal-btn {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         @media (max-width: 500px) {
@@ -193,23 +211,27 @@
 <canvas id="starCanvas"></canvas>
 
 <div id="app">
+    <!-- 步驟 1: 起始頁 -->
     <section id="step1">
         <h1>✨ 寶貝 生日快樂 ✨</h1>
         <p style="font-size: 1.2rem; margin: 12px 0;">你是我宇宙中最亮的星</p>
         <div style="margin: 15px 0;">🌟 💫 ⭐</div>
-        <button onclick="toStep2()">👉 點我進入星空驚喜 👈</button>
-        <div class="instruction">(記得開音樂喔)</div>
+        <button id="startBtn">👉 點我進入星空驚喜 👈</button>
+        <div class="instruction">(點擊後音樂將自動播放 🌸)</div>
     </section>
 
+    <!-- 步驟 2: 照片展示 (拍立得輪播，全部圖片跑完一輪才出現按鈕) -->
     <section id="step2" class="hidden">
         <div class="polaroid" style="transform: rotate(-2deg);">
             <img id="pic" src="https://i.ibb.co/4RBqhdkK/IMG-8809.jpg" alt="我們的回憶">
             <div class="polaroid-text">💖 Happy Birthday to my babe 💖</div>
         </div>
-        <p style="margin-top: 5px;">🌸 可愛寶貝又大一歲了 🌸</p>
-        <button onclick="toStep3()">🎂 切蛋糕看驚喜 🎂</button>
+        <p id="photoCounter" style="margin-top: 8px; font-size: 0.9rem; opacity: 0.8;"></p>
+        <!-- 按鈕初始隱藏，等輪播跑完一輪後才顯示 -->
+        <button id="goToCakeBtn" class="hidden" style="background:#ff9a9e;">🎂 看驚喜 🎂</button>
     </section>
 
+    <!-- 步驟 3: 許願蛋糕 + 吹熄火苗 -->
     <section id="step3" class="hidden">
         <p style="font-size: 1.3rem; font-weight: bold;">🎵 許個願望，吹熄蠟燭吧 🎵</p>
         <div class="cake-wrapper">
@@ -225,6 +247,7 @@
         <button id="forceBlowBtn" style="background:#ffb347; margin-top: 25px;">💨 吹蠟燭！ 💨</button>
     </section>
 
+    <!-- 步驟 4: 結尾與倒數 -->
     <section id="step4" class="hidden">
         <div class="polaroid" style="transform: rotate(3deg);">
             <img id="lastImg" src="https://i.ibb.co/4RBqhdkK/IMG-8809.jpg" alt="約定見面">
@@ -236,18 +259,20 @@
     </section>
 </div>
 
-<!-- 背景音樂 - 改用穩定的公開音樂 -->
+<!-- 背景音樂 (使用您指定的直鏈) -->
 <audio id="bgMusic" loop preload="auto">
-    <source src="https://mp3tourl.com/audio/1777728047005-6cf90b5a-f7a6-4216-bf2a-d581939821cb.mp3" type="audio/mpeg">
+    <source src="https://files.catbox.moe/obciiv.mp3" type="audio/mpeg">
+    <!-- 備用音樂萬一直鏈失效 -->
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
 </audio>
 
 <script>
-    // ========== 星星系統 ==========
+    // ========== 1. 星星系統 (閃爍繁星+流星) ==========
     const canvas = document.getElementById('starCanvas');
     let ctx = canvas.getContext('2d');
     let starsArray = [];
     let shootingStars = [];
-    let starCount = 250;
+    let starCount = 260;
     
     function resizeCanvas() {
         canvas.width = window.innerWidth;
@@ -263,7 +288,7 @@
                 y: Math.random() * canvas.height,
                 radius: Math.random() * 2.5 + 1,
                 alpha: Math.random() * 0.6 + 0.3,
-                blinkSpeed: Math.random() * 0.03 + 0.01
+                blinkSpeed: Math.random() * 0.03 + 0.008
             });
         }
     }
@@ -271,7 +296,6 @@
     function drawStars() {
         if (!ctx) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
         let grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
         grad.addColorStop(0, '#03051a');
         grad.addColorStop(1, '#0b102f');
@@ -279,12 +303,18 @@
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         for (let s of starsArray) {
-            let alphaVal = s.alpha + Math.sin(Date.now() * s.blinkSpeed) * 0.2;
-            alphaVal = Math.min(0.95, Math.max(0.25, alphaVal));
+            let alphaVal = s.alpha + Math.sin(Date.now() * s.blinkSpeed) * 0.22;
+            alphaVal = Math.min(0.96, Math.max(0.25, alphaVal));
             ctx.beginPath();
             ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
             ctx.fillStyle = `rgba(255, 240, 200, ${alphaVal})`;
             ctx.fill();
+            if (s.radius > 2.2) {
+                ctx.shadowBlur = 5;
+                ctx.shadowColor = 'rgba(255,215,0,0.4)';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
         }
         
         // 流星
@@ -292,19 +322,19 @@
             const star = shootingStars[i];
             ctx.beginPath();
             ctx.moveTo(star.x, star.y);
-            ctx.lineTo(star.x + star.speedX * 1.5, star.y + star.speedY * 1.5);
-            ctx.lineWidth = 2;
+            ctx.lineTo(star.x + star.speedX * 1.4, star.y + star.speedY * 1.4);
+            ctx.lineWidth = 2.2;
             ctx.strokeStyle = `rgba(255, 220, 150, ${star.alpha})`;
             ctx.stroke();
             ctx.beginPath();
-            ctx.arc(star.x, star.y, 2, 0, Math.PI*2);
+            ctx.arc(star.x, star.y, 2.2, 0, Math.PI*2);
             ctx.fillStyle = `rgba(255, 200, 100, ${star.alpha})`;
             ctx.fill();
             
             star.x += star.speedX;
             star.y += star.speedY;
-            star.alpha -= 0.015;
-            if (star.x + 50 < 0 || star.x - 50 > canvas.width || star.y > canvas.height + 30 || star.alpha <= 0) {
+            star.alpha -= 0.018;
+            if (star.x + 60 < 0 || star.x - 60 > canvas.width || star.y > canvas.height + 40 || star.alpha <= 0) {
                 shootingStars.splice(i,1);
                 i--;
             }
@@ -312,16 +342,16 @@
     }
     
     function addShootingStar() {
-        if (Math.random() < 0.1) {
+        if (Math.random() < 0.12) {
             shootingStars.push({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height * 0.3,
-                speedX: -5 - Math.random() * 8,
-                speedY: 2 + Math.random() * 5,
-                alpha: 0.8
+                speedX: -4 - Math.random() * 9,
+                speedY: 2 + Math.random() * 6,
+                alpha: 0.85
             });
         }
-        if (shootingStars.length > 10) shootingStars.shift();
+        if (shootingStars.length > 12) shootingStars.shift();
     }
     
     function animateStars() {
@@ -332,50 +362,91 @@
     
     window.addEventListener('resize', () => resizeCanvas());
     
-    // ========== 頁面邏輯 ==========
+    // ========== 2. 核心互動邏輯 ==========
     let photoInterval = null;
     let audio = document.getElementById('bgMusic');
-    let musicPlayAttempted = false;
     let countdownInterval = null;
     let blown = false;
     
-    // ✅ 修正：照片陣列 - 只放純圖片網址！
+    // 照片陣列 (ImgBB 清晰直鏈，您提供的四張)
+    // 注意: 這些直鏈都是您之前確認過的 i.ibb.co 連結，請確保連結有效
     const photosArray = [
-        "https://i.ibb.co/4RBqhdkK/IMG-8809.jpg",   // 您自己的照片
-        "https://i.ibb.co/7JXKt9sH/IMG-8685.jpg",      // 備用可愛圖
-        "https://i.ibb.co/1GmqYZN2/24-FE17-C4-AC93-40-BD-B559-D9-F05698-C1-F4.jpg",      // 備用
-        "https://i.ibb.co/k6XY24c5/IMG-9091.jpg"       // 備用
+        "https://i.ibb.co/4RBqhdkK/IMG-8809.jpg",   // 主照片
+        "https://i.ibb.co/7JXKt9sH/IMG-8685.jpg",   // 清晰照
+        "https://i.ibb.co/1GmqYZN2/24-FE17-C4-AC93-40-BD-B559-D9-F05698-C1-F4.jpg",
+        "https://i.ibb.co/k6XY24c5/IMG-9091.jpg"
     ];
     const lastPhoto = "https://i.ibb.co/4RBqhdkK/IMG-8809.jpg";
     
+    let currentPicIndex = 0;
+    let hasCycledOnce = false;      // 是否已完整輪播一輪
+    let totalPhotos = photosArray.length;
+    
+    // 音樂播放 (由使用者點擊首頁按鈕觸發)
     function playBackgroundMusic() {
         if (audio) {
-            audio.volume = 0.4;
-            audio.play().catch(e => console.log("需要用戶互動"));
+            audio.volume = 0.45;
+            audio.play().then(() => {
+                console.log("🎵 音樂播放成功 💖");
+            }).catch(e => {
+                console.log("自動播放受限，但仍可點擊");
+                // 某些瀏覽器仍需額外交互，但已在點擊時調用，問題不大
+            });
         }
     }
     
+    // 顯示步驟2，並啟動輪播 (條件：輪播完整一輪後才顯示按鈕)
     function toStep2() {
-        if (!musicPlayAttempted) {
-            playBackgroundMusic();
-            musicPlayAttempted = true;
-        }
-        
+        // 隱藏步驟1
         document.getElementById('step1').classList.add('hidden');
-        document.getElementById('step2').classList.remove('hidden');
+        const step2Div = document.getElementById('step2');
+        step2Div.classList.remove('hidden');
         
-        let picIndex = 0;
-        const picElement = document.getElementById('pic');
+        // 重置輪播狀態
         if (photoInterval) clearInterval(photoInterval);
+        currentPicIndex = 0;
+        hasCycledOnce = false;
+        const picElement = document.getElementById('pic');
+        const goBtn = document.getElementById('goToCakeBtn');
+        const counterEl = document.getElementById('photoCounter');
+        
+        // 隱藏按鈕 + 重置計數器文字
+        goBtn.classList.add('hidden');
+        counterEl.innerText = `📸 回憶載入中 ${currentPicIndex+1} / ${totalPhotos}`;
+        
+        // 設定第一張照片
         picElement.src = photosArray[0];
+        
+        // 開始輪播 (每隔2.8秒換一張)
         photoInterval = setInterval(() => {
-            picIndex = (picIndex + 1) % photosArray.length;
-            picElement.src = photosArray[picIndex];
+            // 移動到下一張
+            let nextIndex = (currentPicIndex + 1) % totalPhotos;
+            currentPicIndex = nextIndex;
+            picElement.src = photosArray[currentPicIndex];
+            counterEl.innerText = `📸 回憶重溫 ${currentPicIndex+1} / ${totalPhotos}`;
+            
+            // 檢查是否完成一輪 (從最後一張回到第一張的時候)
+            if (currentPicIndex === 0 && !hasCycledOnce) {
+                // 已經完整跑過一圈 (從0->1->2->3->0)
+                hasCycledOnce = true;
+                // 清除輪播計時器，停在最後一張(或者繼續也可以，但按鈕出現，仍可保留溫暖)
+                if (photoInterval) clearInterval(photoInterval);
+                photoInterval = null;
+                counterEl.innerText = `✨ 滿滿回憶 ✨ 共 ${totalPhotos} 張珍貴瞬間`;
+                // 顯示按鈕 ＋ 可愛彈出動畫
+                goBtn.classList.remove('hidden');
+                goBtn.classList.add('reveal-btn');
+                // 可額外撒小花效果(簡單震動)
+            }
         }, 2800);
     }
     
+    // 前往蛋糕頁 (步驟3)
     function toStep3() {
-        if (photoInterval) clearInterval(photoInterval);
+        if (photoInterval) {
+            clearInterval(photoInterval);
+            photoInterval = null;
+        }
         document.getElementById('step2').classList.add('hidden');
         document.getElementById('step3').classList.remove('hidden');
         
@@ -385,9 +456,11 @@
             flame.classList.remove('flame-out');
             flame.style.animation = 'flicker 0.18s infinite alternate';
             flame.style.opacity = '1';
+            flame.style.transform = 'translateX(-50%) scale(1)';
         }
     }
     
+    // 吹熄蠟燭邏輯
     function blowCandle() {
         if (blown) return;
         const flame = document.getElementById('candleFlame');
@@ -395,23 +468,33 @@
         
         flame.classList.add('flame-out');
         flame.style.animation = 'none';
+        flame.style.boxShadow = 'none';
         blown = true;
         
+        // 微震動回饋
+        const cakeDiv = document.querySelector('.cake');
+        if (cakeDiv) {
+            cakeDiv.style.transform = 'scale(0.97)';
+            setTimeout(() => { if(cakeDiv) cakeDiv.style.transform = ''; }, 130);
+        }
+        
+        // 0.4秒後進入最終祝福頁
         setTimeout(() => {
             toStep4();
-        }, 350);
+        }, 380);
     }
     
     function toStep4() {
         if (countdownInterval) clearInterval(countdownInterval);
         document.getElementById('step3').classList.add('hidden');
-        document.getElementById('step4').classList.remove('hidden');
+        const step4Div = document.getElementById('step4');
+        step4Div.classList.remove('hidden');
         
         const lastImgElem = document.getElementById('lastImg');
         if (lastImgElem) lastImgElem.src = lastPhoto;
         
+        // 倒數 2026/7/9
         const targetDate = new Date("July 9, 2026 00:00:00").getTime();
-        
         function updateCountdown() {
             const now = new Date().getTime();
             const distance = targetDate - now;
@@ -423,25 +506,34 @@
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
             const hours = Math.floor((distance % 86400000) / 3600000);
             const minutes = Math.floor((distance % 3600000) / 60000);
-            const seconds = Math.floor((distance % 60000) / 1000);
-            document.getElementById('cd').innerHTML = `📅 距離7月9日見面還有 ${days}天 ${hours}時 ${minutes}分 ${seconds}秒 💖`;
+            const secs = Math.floor((distance % 60000) / 1000);
+            document.getElementById('cd').innerHTML = `📅 距離7月9日見面還有 ${days}天 ${hours}時 ${minutes}分 ${secs}秒 💖`;
         }
         updateCountdown();
         countdownInterval = setInterval(updateCountdown, 1000);
         
         if (audio && audio.paused) {
-            audio.play().catch(e => {});
+            audio.play().catch(e => console.log("音樂播放需互動"));
         }
     }
     
-    function bindExtraButtons() {
-        const replayBtn = document.getElementById('playMusicAgain');
-        if (replayBtn) {
-            replayBtn.addEventListener('click', () => {
-                if (audio) {
-                    audio.currentTime = 0;
-                    audio.play().catch(e => console.log);
-                }
+    // 綁定事件 & 首頁音樂+顯示控制 (修正: 點首頁按鈕時播放音樂 + 到第二頁)
+    function bindInteractions() {
+        const startBtn = document.getElementById('startBtn');
+        if (startBtn) {
+            startBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                // 播放音樂 (確保是使用者點擊觸發)
+                playBackgroundMusic();
+                // 前往第二頁
+                toStep2();
+            });
+        }
+        
+        const goToCake = document.getElementById('goToCakeBtn');
+        if (goToCake) {
+            goToCake.addEventListener('click', () => {
+                toStep3();
             });
         }
         
@@ -464,15 +556,40 @@
                 if (!blown) blowCandle();
             });
         }
+        
+        const replayBtn = document.getElementById('playMusicAgain');
+        if (replayBtn) {
+            replayBtn.addEventListener('click', () => {
+                if (audio) {
+                    audio.currentTime = 0;
+                    audio.play().catch(e => console.log);
+                }
+            });
+        }
     }
     
+    // 預先載入圖片優化體驗 (可選)
+    function preloadImages() {
+        photosArray.forEach(src => {
+            const img = new Image();
+            img.src = src;
+        });
+        const lastImgPre = new Image();
+        lastImgPre.src = lastPhoto;
+    }
+    
+    // 初始化星星與事件
     window.onload = () => {
         resizeCanvas();
         animateStars();
-        bindExtraButtons();
+        bindInteractions();
+        preloadImages();  // 提前加載照片, 讓輪播更流暢
+        
+        // 確保音樂不會自動播放（因瀏覽器策略，首頁按鈕點擊後才播放，已符合")
+        // 另外，如果用戶在 step3 不小心重複吹熄防呆完善
     };
     
-    window.toStep2 = toStep2;
+    // 全域備份 (避免遺漏)
     window.toStep3 = toStep3;
     window.blowCandle = blowCandle;
     
@@ -480,6 +597,10 @@
         if (photoInterval) clearInterval(photoInterval);
         if (countdownInterval) clearInterval(countdownInterval);
     });
+    
+    // 對於模糊圖片的修正說明: 我們使用的 i.ibb.co 連結皆是從 ImgBB 複製的「原圖直鏈」
+    // 如果其中一張依舊略糊, 建議在原網站重新獲取原圖網址 (帶 o.jpg)
+    // 但依據目前您給的 IMG-8685 等，都已是清楚版本，輪播效果自然。
 </script>
 </body>
 </html>
