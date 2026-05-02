@@ -217,7 +217,7 @@
         <p style="font-size: 1.2rem; margin: 12px 0;">你是我宇宙中最亮的星</p>
         <div style="margin: 15px 0;">🌟 💫 ⭐</div>
         <button id="startBtn">👉 點我進入星空驚喜 👈</button>
-        <div class="instruction">(點擊後音樂將自動播放 🌸)</div>
+        <div class="instruction">(記得開聲音喔🌸)</div>
     </section>
 
     <!-- 步驟 2: 照片展示 (拍立得輪播，全部圖片跑完一輪才出現按鈕) -->
@@ -251,7 +251,7 @@
     <section id="step4" class="hidden">
         <div class="polaroid" style="transform: rotate(3deg);">
             <img id="lastImg" src="https://i.ibb.co/4RBqhdkK/IMG-8809.jpg" alt="約定見面">
-            <div class="polaroid-text">❤️ 愛你愛你愛你 ❤️</div>
+            <div class="polaroid-text">❤️ 愛你愛你 ❤️</div>
         </div>
         <div id="cd" class="timer">計算甜蜜倒數中...</div>
         <p style="margin-top: 12px;">💌 我最愛的寶貝，生日快樂 💌</p>
@@ -261,9 +261,7 @@
 
 <!-- 背景音樂 (使用您指定的直鏈) -->
 <audio id="bgMusic" loop preload="auto">
-    <source src="https://files.catbox.moe/obciiv.mp3" type="audio/mpeg">
-    <!-- 備用音樂萬一直鏈失效 -->
-    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
+    <source src="https://mp3tourl.com/audio/1777740413975-975e6bc2-9902-41ae-9e1d-d17d78c0c4cc.mp3" type="audio/mpeg">
 </audio>
 
 <script>
@@ -412,7 +410,7 @@
         
         // 隱藏按鈕 + 重置計數器文字
         goBtn.classList.add('hidden');
-        counterEl.innerText = `📸 回憶載入中 ${currentPicIndex+1} / ${totalPhotos}`;
+        counterEl.innerText = `📸 謝謝寶寶過來找我！ ${currentPicIndex+1} / ${totalPhotos}`;
         
         // 設定第一張照片
         picElement.src = photosArray[0];
@@ -423,7 +421,7 @@
             let nextIndex = (currentPicIndex + 1) % totalPhotos;
             currentPicIndex = nextIndex;
             picElement.src = photosArray[currentPicIndex];
-            counterEl.innerText = `📸 回憶重溫 ${currentPicIndex+1} / ${totalPhotos}`;
+            counterEl.innerText = `📸 最愛你了 ${currentPicIndex+1} / ${totalPhotos}`;
             
             // 檢查是否完成一輪 (從最後一張回到第一張的時候)
             if (currentPicIndex === 0 && !hasCycledOnce) {
@@ -432,7 +430,7 @@
                 // 清除輪播計時器，停在最後一張(或者繼續也可以，但按鈕出現，仍可保留溫暖)
                 if (photoInterval) clearInterval(photoInterval);
                 photoInterval = null;
-                counterEl.innerText = `✨ 滿滿回憶 ✨ 共 ${totalPhotos} 張珍貴瞬間`;
+                counterEl.innerText = `✨ 滿滿的回憶 ✨ 共 ${totalPhotos} 張珍貴瞬間`;
                 // 顯示按鈕 ＋ 可愛彈出動畫
                 goBtn.classList.remove('hidden');
                 goBtn.classList.add('reveal-btn');
@@ -597,10 +595,7 @@
         if (photoInterval) clearInterval(photoInterval);
         if (countdownInterval) clearInterval(countdownInterval);
     });
-    
-    // 對於模糊圖片的修正說明: 我們使用的 i.ibb.co 連結皆是從 ImgBB 複製的「原圖直鏈」
-    // 如果其中一張依舊略糊, 建議在原網站重新獲取原圖網址 (帶 o.jpg)
-    // 但依據目前您給的 IMG-8685 等，都已是清楚版本，輪播效果自然。
+
 </script>
 </body>
 </html>
