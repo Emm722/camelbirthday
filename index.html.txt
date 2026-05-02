@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>生日快樂，我的專屬星空</title>
+    <title>生日快樂，我的寶貝</title>
     <style>
         /* 星空背景樣式 */
         body { 
@@ -73,13 +73,13 @@
 
 <!-- 背景音樂：這裡使用了一首鋼琴曲示例網址，你可以換成你喜歡的 mp3 連結 -->
 <audio id="bgMusic" loop>
-    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    <source src="https://vps-5fef95ca.ytconvert.org/files/mQXonkdM6VLoofa3act2Z/output.mp3?token=72a12fc0fbc57ddb80b9dc495e9e3430d455c37901c26f40bdefadff07eff834&expires=1777718482">
 </audio>
 
 <div id="app">
     <!-- 第一階段：音樂啟動與回憶 -->
     <div id="step1">
-        <h2 style="letter-spacing: 2px;">嘿，生日快樂！</h2>
+        <h2 style="letter-spacing: 2px;">嘿駱駝，生日快樂！</h2>
         <p>點擊開啟屬於我們的星空</p>
         <button onclick="startExperience()">開啟回憶</button>
     </div>
@@ -87,8 +87,8 @@
     <!-- 第二階段：拍立得照片 -->
     <div id="step2" style="display:none;">
         <div class="polaroid-frame">
-            <img src="你的照片網址1" id="slideshow">
-            <div class="polaroid-text">相遇的第 XXX 天 ❤️</div>
+            <img src="你<a href="https://ibb.co/Kzwv1L0X"><img src="https://i.ibb.co/sJHYB6m2/IMG-8809.jpg" alt="IMG-8809" border="0"></a>" id="slideshow">
+            <div class="polaroid-text">交往的第397天❤️</div>
         </div>
         <button onclick="showCake()">許個願吧</button>
     </div>
@@ -107,7 +107,7 @@
         <h2 style="color: #ff7b9c;">願望一定會實現！</h2>
         <div class="polaroid-frame" style="transform: rotate(2deg);">
             <img src="你的照片網址2">
-            <div class="polaroid-text">下次見面，親口對你說生日快樂</div>
+            <div class="polaroid-text">下次見面，親口對你說生日快樂嘻嘻</div>
         </div>
         
         <div id="countdown">
