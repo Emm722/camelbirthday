@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>生日快樂！專屬浪漫星空</title>
+    <title>寶貝生日快樂！</title>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #020205; font-family: 'PingFang TC', sans-serif; }
         .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/123163/stars.png') repeat; opacity: 0.6; }
@@ -49,15 +49,15 @@
     <!-- 第一頁：音樂啟動 -->
     <div id="step1">
         <h1 style="font-size: 2rem;">Hey...</h1>
-        <p>明天是一個特別的日子</p>
+        <p>今天是一個特別的日子</p>
         <button onclick="startAll()">進入我們的星空</button>
     </div>
 
     <!-- 第二頁：照片回憶 -->
     <div id="step2" class="hidden">
         <div class="polaroid">
-            <img id="slideshow" src="你的照片連結1">
-            <div class="polaroid-text">那些想你的瞬間 ❤️</div>
+            <img id="slideshow" src="<a href="https://ibb.co/Tx8mrGf9"><img src="https://i.ibb.co/LXtnvyFV/IMG-8809.jpg" alt="IMG-8809" border="0"></a>">
+            <div class="polaroid-text">駱駱大一歲了！謝謝你一直都在❤️</div>
         </div>
         <button onclick="toCake()">這是我準備的驚喜</button>
     </div>
@@ -78,11 +78,11 @@
     <!-- 第四頁：倒數與結尾 -->
     <div id="step4" class="hidden">
         <div class="polaroid" style="transform: rotate(3deg);">
-            <img src="你的照片連結2">
-            <div class="polaroid-text">7月9日，等我抱你</div>
+            <img src="<a href="https://ibb.co/MDMm595D"><img src="https://i.ibb.co/tM89P3PM/IMG-8685.jpg" alt="IMG-8685" border="0"></a>">
+            <div class="polaroid-text">7月9日，等我來抱你嘻嘻</div>
         </div>
         <div class="countdown-box">
-            <div>距離重逢還有：</div>
+            <div>距離下次見面還有：</div>
             <div id="timer" class="timer">載入中...</div>
         </div>
     </div>
@@ -91,7 +91,7 @@
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 <script>
     const music = document.getElementById('bgMusic');
-    const photos = ["你的照片連結1", "你的照片連結2", "你的照片連結3"]; // 記得換成真實連結
+    const photos = ["<a href="https://ibb.co/LHP0p6z"><img src="https://i.ibb.co/y7RNs5n/IMG-7491.png" alt="IMG-7491" border="0"></a>", "<a href="https://ibb.co/yBqLF6sd"><img src="https://i.ibb.co/gFJsZSgm/IMG-9091.jpg" alt="IMG-9091" border="0"></a>", "<a href="https://ibb.co/vps9VZ1"><img src="https://i.ibb.co/4zskKPW/IMG-1789.png" alt="IMG-1789" border="0"></a>"]; // 記得換成真實連結
     let photoIdx = 0;
 
     function startAll() {
